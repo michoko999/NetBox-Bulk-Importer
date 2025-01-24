@@ -7,6 +7,7 @@ NetBox-Bulk-Importer is a Python script designed to automate the bulk import of 
 - Uploads files to the NetBox bulk import endpoint for device types.
 - Provides detailed success and error messages for each file.
 - Supports session-based authentication with CSRF protection.
+- Compatible with NetBox version 4.2.2.
 
 ---
 
@@ -24,7 +25,7 @@ Before using this script, ensure you have:
 
 1. Clone this repository:
     ```bash
-    git clone https://github.com/michoko999/NetBox-Bulk-Importer.git
+    git clone https://github.com/your-username/NetBox-Bulk-Importer.git
     cd NetBox-Bulk-Importer
     ```
 
@@ -41,7 +42,7 @@ Before using this script, ensure you have:
    - Replace the placeholder `url` variable with the bulk import endpoint of your NetBox instance (e.g., `http://192.168.1.X/dcim/device-types/bulk_import/`).
    - Replace the `csrftoken` and `sessionid` in the `cookies` dictionary with valid values from your session.
 
-2. Place all the YAML files you want to upload into the `yaml` directory (or update the `yaml_directory` variable to point to your desired directory).
+2. Place all the YAML files you want to upload into the `yaml` directory (or update the `yaml_directory` variable to point to your desired directory). YAML files can also be found in the [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library).
 
 3. Run the script:
     ```bash
@@ -96,4 +97,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contributing
 Contributions are welcome! If you encounter issues or have feature requests, please open an issue or submit a pull request.
-
