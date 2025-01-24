@@ -1,70 +1,100 @@
-import os
-import requests
-import time
+# NetBox-Bulk-Importer
 
-# Destination URL for uploading files
-url = 'http://192.168.1.X/dcim/device-types/bulk_import/'
+NetBox-Bulk-Importer is a Python script designed to automate the bulk import of device type definitions into a NetBox instance. It leverages the NetBox web interface's bulk import functionality to upload YAML files programmatically.
 
-# Path to the directory containing the YAML files
-yaml_directory = 'yaml'
+## Features
+- Automatically scans a specified directory for `.yaml` files.
+- Uploads files to the NetBox bulk import endpoint for device types.
+- Provides detailed success and error messages for each file.
+- Supports session-based authentication with CSRF protection.
+- Compatible with NetBox version 4.2.2.
 
-# Get all .yaml files in the directory
-yaml_files = [f for f in os.listdir(yaml_directory) if f.endswith('.yaml')]
+---
 
-# Cookie and CSRF token to use (from your session)
-cookies = {
-    'csrftoken': 'TOKEN',  # Remplacez par le token CSRF valide
-    'sessionid': 'ID',  # Remplacez par votre sessionid
-}
+## Prerequisites
+Before using this script, ensure you have:
 
-# Headers to simulate a valid request (taking into account the headers in your example)
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Accept-Encoding': 'gzip, deflate',
-    'Referer': 'http://192.168.X.X/dcim/device-types/bulk_import/',
-    'Origin': 'http://192.168.X.X',
-}
+1. A functioning NetBox instance accessible via HTTP.
+2. A directory containing the YAML files you wish to upload.
+3. A valid session cookie (`sessionid`) and CSRF token (`csrftoken`) from your authenticated NetBox session.
+4. Python 3 installed on your system.
 
-# Counter to track successfully sent files
-successful_uploads = 0
-total_files = len(yaml_files)
+---
 
-# Loop through all YAML files and send them
-for yaml_file in yaml_files:
-    file_path = os.path.join(yaml_directory, yaml_file)
+## Installation
 
-    with open(file_path, 'rb') as f:
-        # Create the payload for the file
-        files = {
-            'csrfmiddlewaretoken': (None, cookies['csrftoken']),  # Le token CSRF
-            'import_method': (None, 'upload'),
-            'upload_file': (yaml_file, f, 'application/yaml'),  # Envoyer le fichier avec le type MIME correct
-            'format': (None, 'auto'),
-            'csv_delimiter': (None, 'auto'),
-            'file_submit': (None, ''),
-        }
+1. Clone this repository:
+    ```bash
+    git clone https://github.com/your-username/NetBox-Bulk-Importer.git
+    cd NetBox-Bulk-Importer
+    ```
 
-        # Perform POST request
-        response = requests.post(url, headers=headers, cookies=cookies, files=files)
+2. Install the required Python dependencies:
+    ```bash
+    pip install requests
+    ```
 
-        # Check if the request was successful
-        if response.status_code == 200:
-            print(f"Fichier '{yaml_file}' envoyé avec succès.")
-            successful_uploads += 1
-        else:
-            print(f"Échec de l'envoi du fichier '{yaml_file}'. Code: {response.status_code}")
-            print(f"Réponse : {response.text}")
-            print(f"En-têtes : {response.headers}")
-            print(f"Cookies envoyés : {cookies}")
-            print(f"Data envoyée : {files}")
+---
 
-    # Wait 1 second before moving to the next file
-    time.sleep(1)
+## Usage
 
-# Displaying the final message
-if successful_uploads == total_files:
-    print(f"Tous les fichiers ({successful_uploads}/{total_files}) ont été envoyés avec succès !")
-else:
-    print(f"{successful_uploads}/{total_files} fichiers ont été envoyés avec succès. Des erreurs sont survenues.")
+1. Update the script with your NetBox instance's details:
+   - Replace the placeholder `url` variable with the bulk import endpoint of your NetBox instance (e.g., `http://192.168.1.X/dcim/device-types/bulk_import/`).
+   - Replace the `csrftoken` and `sessionid` in the `cookies` dictionary with valid values from your session.
+
+2. Place all the YAML files you want to upload into the `yaml` directory (or update the `yaml_directory` variable to point to your desired directory). YAML files can also be found in the [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library).
+
+3. Run the script:
+    ```bash
+    python3 netbox_bulk_importer.py
+    ```
+
+4. The script will:
+   - Iterate through all `.yaml` files in the specified directory.
+   - Upload each file to the NetBox bulk import endpoint.
+   - Print a success message for successful uploads or detailed error information for failed attempts.
+
+---
+
+## Example Output
+
+Here’s an example of what the output might look like:
+
+```plaintext
+Fichier 'device1.yaml' été envoyé avec succès.
+Fichier 'device2.yaml' été envoyé avec succès.
+Échec de l'envoi du fichier 'device3.yaml'. Code: 400
+Réponse : Invalid file format.
+En-têtes : {...}
+Cookies envoyés : {...}
+Data envoyée : {...}
+2/3 fichiers ont été envoyés avec succès. Des erreurs sont survenues.
+```
+
+---
+
+## Customization
+
+- **YAML Directory**: Update the `yaml_directory` variable to specify the path to your YAML files.
+- **NetBox URL**: Update the `url` variable to match your NetBox instance’s bulk import URL.
+- **Authentication**: Update the `cookies` dictionary with your `csrftoken` and `sessionid` values.
+- **Headers**: The `headers` dictionary can be modified to match your specific request needs.
+
+---
+
+## Notes
+
+- The script uses a 1-second delay between uploads to prevent server overload. You can adjust this delay if needed.
+- Ensure that your YAML files are correctly formatted and valid for NetBox’s bulk import requirements.
+- The script does not include SSL support, as your NetBox instance is configured for HTTP.
+
+---
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Contributing
+Contributions are welcome! If you encounter issues or have feature requests, please open an issue or submit a pull request.
+
